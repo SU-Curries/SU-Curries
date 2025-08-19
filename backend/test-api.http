@@ -1,0 +1,499 @@
+# SU Curries API Test Script
+# Use this file with REST Client extension in VS Code or similar HTTP client
+
+### Variables
+@baseUrl = http://localhost:3000
+@adminToken = YOUR_ADMIN_JWT_TOKEN_HERE
+@userToken = YOUR_USER_JWT_TOKEN_HERE
+
+### Health Check
+GET {{baseUrl}}/health
+
+### Database Health Check
+GET {{baseUrl}}/health/db
+
+### Register a new user
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "SecurePassword123!",
+  "firstName": "John",
+  "lastName": "Doe",
+  "phone": "+1234567890",
+  "dataProcessingConsent": true,
+  "marketingConsent": true
+}
+
+### Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "SecurePassword123!"
+}
+
+### Get user profile (requires authentication)
+GET {{baseUrl}}/users/profile
+Authorization: Bearer {{userToken}}
+
+### Create a category (admin only)
+POST {{baseUrl}}/categories
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Curry Bases",
+  "description": "Premium curry bases for authentic Indian dishes",
+  "image": "https://example.com/curry-bases.jpg",
+  "sortOrder": 1,
+  "isActive": true
+}
+
+### Get all categories
+GET {{baseUrl}}/categories
+
+### Create a product (admin only)
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Butter Chicken Curry Base",
+  "description": "A rich and creamy curry base perfect for making authentic butter chicken.",
+  "price": 5.99,
+  "sku": "BC-001",
+  "stockQuantity": 100,
+  "weight": 0.5,
+  "weightUnit": "kg",
+  "images": ["https://example.com/butter-chicken.jpg"],
+  "featuredImage": "https://example.com/butter-chicken.jpg",
+  "isFeatured": true,
+  "spiceLevel": 2,
+  "categoryId": "CATEGORY_ID_HERE"
+}
+
+### Get all products
+GET {{baseUrl}}/products
+
+### Get featured products
+GET {{baseUrl}}/products/featured?limit=4
+
+### Search products
+GET {{baseUrl}}/products?search=chicken&minPrice=5&maxPrice=10&sortBy=price&sortOrder=asc
+
+### Calculate cart
+POST {{baseUrl}}/orders/calculate
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "productId": "PRODUCT_ID_HERE",
+      "quantity": 2
+    }
+  ]
+}
+
+### Create order as guest
+POST {{baseUrl}}/orders/guest
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "productId": "PRODUCT_ID_HERE",
+      "quantity": 2
+    }
+  ],
+  "customerEmail": "customer@example.com",
+  "customerFirstName": "Jane",
+  "customerLastName": "Smith",
+  "customerPhone": "+1234567890",
+  "shippingAddress": {
+    "street": "123 Main St",
+    "city": "Berlin",
+    "state": "Berlin",
+    "postalCode": "10115",
+    "country": "Germany"
+  },
+  "notes": "Please leave at the door"
+}
+
+### Create order as authenticated user
+POST {{baseUrl}}/orders
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "items": [
+    {
+      "productId": "PRODUCT_ID_HERE",
+      "quantity": 1
+    }
+  ],
+  "customerEmail": "john.doe@example.com",
+  "customerFirstName": "John",
+  "customerLastName": "Doe",
+  "shippingAddress": {
+    "street": "456 Oak Ave",
+    "city": "Berlin",
+    "state": "Berlin",
+    "postalCode": "10115",
+    "country": "Germany"
+  }
+}
+
+### Get user orders
+GET {{baseUrl}}/orders
+Authorization: Bearer {{userToken}}
+
+### Get all orders (admin only)
+GET {{baseUrl}}/orders/admin?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+### Add user address
+POST {{baseUrl}}/users/profile/addresses
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "label": "Home",
+  "street": "789 Pine St",
+  "city": "Berlin",
+  "state": "Berlin",
+  "postalCode": "10115",
+  "country": "Germany",
+  "isDefault": true
+}
+
+### Get user addresses
+GET {{baseUrl}}/users/profile/addresses
+Authorization: Bearer {{userToken}}
+
+### Change password
+PATCH {{baseUrl}}/users/profile/password
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "currentPassword": "SecurePassword123!",
+  "newPassword": "NewSecurePassword123!"
+}
+
+### Update user profile
+PATCH {{baseUrl}}/users/profile
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "firstName": "John Updated",
+  "phone": "+9876543210",
+  "preferredLanguage": "de"
+}
+
+# ===== PAYMENT SYSTEM =====
+
+### Create payment intent
+POST {{baseUrl}}/payments/create-intent
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "orderId": "ORDER_ID_HERE",
+  "amount": 25.99,
+  "currency": "EUR",
+  "paymentMethod": "card"
+}
+
+### Process payment
+POST {{baseUrl}}/payments/process
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "paymentId": "PAYMENT_ID_HERE",
+  "stripePaymentIntentId": "pi_1234567890abcdef"
+}
+
+### Get payments for order
+GET {{baseUrl}}/payments/order/ORDER_ID_HERE
+Authorization: Bearer {{userToken}}
+
+### Refund payment (admin only)
+POST {{baseUrl}}/payments/refund
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "paymentId": "PAYMENT_ID_HERE",
+  "amount": 10.50,
+  "reason": "Customer requested refund"
+}
+
+# ===== FILE UPLOAD SYSTEM =====
+
+### Upload single image (admin only)
+POST {{baseUrl}}/upload/image?folder=products
+Authorization: Bearer {{adminToken}}
+Content-Type: multipart/form-data
+
+# Note: Use a REST client that supports file uploads
+# Add file field named "file" with an image
+
+### Upload multiple images (admin only)
+POST {{baseUrl}}/upload/images?folder=products
+Authorization: Bearer {{adminToken}}
+Content-Type: multipart/form-data
+
+# Note: Use a REST client that supports file uploads
+# Add files field named "files" with multiple images
+
+### Serve uploaded file
+GET {{baseUrl}}/upload/serve/products/filename.jpg
+
+# ===== COOKING CLASSES & BOOKINGS =====
+
+### Create cooking class (admin only)
+POST {{baseUrl}}/cooking-classes
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "title": "Authentic Butter Chicken Masterclass",
+  "description": "Learn to make restaurant-quality butter chicken from scratch",
+  "category": "Indian Curries",
+  "difficulty": "Intermediate",
+  "price": 45.00,
+  "maxParticipants": 8,
+  "durationMinutes": 180,
+  "startDateTime": "2024-08-15T14:00:00Z",
+  "instructor": "Chef Priya Sharma",
+  "location": "SU Curries Kitchen, Berlin",
+  "includedItems": ["Apron", "Recipe booklet", "Spice samples"],
+  "prerequisites": ["Basic knife skills", "Understanding of spices"],
+  "imageUrl": "https://example.com/class-image.jpg",
+  "isActive": true
+}
+
+### Get all cooking classes
+GET {{baseUrl}}/cooking-classes?page=1&limit=10&category=Indian%20Curries&difficulty=Intermediate
+
+### Get cooking class by ID
+GET {{baseUrl}}/cooking-classes/CLASS_ID_HERE
+
+### Update cooking class (admin only)
+PATCH {{baseUrl}}/cooking-classes/CLASS_ID_HERE
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "price": 50.00,
+  "maxParticipants": 10
+}
+
+### Create booking
+POST {{baseUrl}}/bookings
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "cookingClassId": "CLASS_ID_HERE",
+  "numberOfParticipants": 2,
+  "customerEmail": "john.doe@example.com",
+  "customerFirstName": "John",
+  "customerLastName": "Doe",
+  "customerPhone": "+1234567890",
+  "specialRequests": "Vegetarian dietary requirements"
+}
+
+### Create booking as guest
+POST {{baseUrl}}/bookings/guest
+Content-Type: application/json
+
+{
+  "cookingClassId": "CLASS_ID_HERE",
+  "numberOfParticipants": 1,
+  "customerEmail": "guest@example.com",
+  "customerFirstName": "Guest",
+  "customerLastName": "User",
+  "specialRequests": "First time cooking"
+}
+
+### Get user bookings
+GET {{baseUrl}}/bookings?page=1&limit=10&status=confirmed
+Authorization: Bearer {{userToken}}
+
+### Get all bookings (admin only)
+GET {{baseUrl}}/bookings/admin?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+### Get booking by ID
+GET {{baseUrl}}/bookings/BOOKING_ID_HERE
+Authorization: Bearer {{userToken}}
+
+### Update booking status (admin only)
+PATCH {{baseUrl}}/bookings/BOOKING_ID_HERE
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "confirmed"
+}
+
+### Cancel booking
+PATCH {{baseUrl}}/bookings/BOOKING_ID_HERE/cancel
+Authorization: Bearer {{userToken}}
+
+### Get booking statistics (admin only)
+GET {{baseUrl}}/bookings/stats
+Authorization: Bearer {{adminToken}}
+
+# ===== ANALYTICS & REPORTING =====
+
+### Get dashboard overview (admin only)
+GET {{baseUrl}}/analytics/dashboard?startDate=2024-01-01&endDate=2024-12-31
+Authorization: Bearer {{adminToken}}
+
+### Get sales metrics (admin only)
+GET {{baseUrl}}/analytics/sales?startDate=2024-01-01&endDate=2024-12-31
+Authorization: Bearer {{adminToken}}
+
+### Get booking metrics (admin only)
+GET {{baseUrl}}/analytics/bookings?startDate=2024-01-01&endDate=2024-12-31
+Authorization: Bearer {{adminToken}}
+
+### Get customer metrics (admin only)
+GET {{baseUrl}}/analytics/customers?startDate=2024-01-01&endDate=2024-12-31
+Authorization: Bearer {{adminToken}}
+
+### Get inventory metrics (admin only)
+GET {{baseUrl}}/analytics/inventory
+Authorization: Bearer {{adminToken}}
+
+### Get revenue chart data (admin only)
+GET {{baseUrl}}/analytics/revenue-chart?startDate=2024-01-01&endDate=2024-12-31&interval=day
+Authorization: Bearer {{adminToken}}
+
+# ===== REVIEWS & RATINGS =====
+
+### Get all reviews
+GET {{baseUrl}}/reviews?page=1&limit=10&type=product&targetId=PRODUCT_ID_HERE
+
+### Get review statistics
+GET {{baseUrl}}/reviews/stats/product/PRODUCT_ID_HERE
+
+### Create product review
+POST {{baseUrl}}/reviews
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "type": "product",
+  "targetId": "PRODUCT_ID_HERE",
+  "rating": 5,
+  "comment": "Excellent product! The curry base made an amazing butter chicken.",
+  "images": ["https://example.com/my-dish.jpg"]
+}
+
+### Create cooking class review
+POST {{baseUrl}}/reviews
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "type": "cooking_class",
+  "targetId": "CLASS_ID_HERE",
+  "rating": 4,
+  "comment": "Great class! Learned a lot about authentic Indian cooking techniques."
+}
+
+### Update review
+PATCH {{baseUrl}}/reviews/REVIEW_ID_HERE
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "rating": 5,
+  "comment": "Updated review - even better than I initially thought!"
+}
+
+### Mark review as helpful
+POST {{baseUrl}}/reviews/REVIEW_ID_HERE/helpful
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "isHelpful": true
+}
+
+### Moderate review (admin only)
+PATCH {{baseUrl}}/reviews/REVIEW_ID_HERE/moderate
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "approved",
+  "moderatorNotes": "Review approved after verification"
+}
+
+### Delete review
+DELETE {{baseUrl}}/reviews/REVIEW_ID_HERE
+Authorization: Bearer {{userToken}}
+
+# ===== LOYALTY PROGRAM =====
+
+### Get user loyalty account
+GET {{baseUrl}}/loyalty/account
+Authorization: Bearer {{userToken}}
+
+### Get loyalty transactions
+GET {{baseUrl}}/loyalty/transactions?page=1&limit=20
+Authorization: Bearer {{userToken}}
+
+### Get available rewards
+GET {{baseUrl}}/loyalty/rewards
+Authorization: Bearer {{userToken}}
+
+### Redeem loyalty reward
+POST {{baseUrl}}/loyalty/redeem/REWARD_ID_HERE
+Authorization: Bearer {{userToken}}
+
+### Award points to user (admin only)
+POST {{baseUrl}}/loyalty/admin/award/USER_ID_HERE
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "points": 500,
+  "reason": "admin_adjustment",
+  "description": "Bonus points for customer feedback"
+}
+
+### Redeem points from user (admin only)
+POST {{baseUrl}}/loyalty/admin/redeem/USER_ID_HERE
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "points": 100,
+  "reason": "admin_adjustment",
+  "description": "Points adjustment for return"
+}
+
+### Get all loyalty accounts (admin only)
+GET {{baseUrl}}/loyalty/admin/accounts
+Authorization: Bearer {{adminToken}}
+
+# ===== EMAIL TESTING =====
+
+### Send welcome email (triggered automatically on registration)
+# This endpoint would be internal/admin only for testing
+
+### Send order confirmation email (triggered automatically on order creation)
+# This endpoint would be internal/admin only for testing
+
+### Send booking confirmation email (triggered automatically on booking creation)
+# This endpoint would be internal/admin only for testing

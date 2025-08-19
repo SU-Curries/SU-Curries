@@ -1,0 +1,23 @@
+{
+  "header": {
+    "home": "Accueil",
+    "store": "Boutique",
+    "book_table": "Réserver une table",
+    "services": "Services",
+    "catering": "Traiteur",
+    "about_us": "À propos",
+    "contact_us": "Contact",
+    "login": "Connexion",
+    "register": "S'inscrire"
+  },
+  "homepage": {
+    "welcome": "Bienvenue chez SU Foods"
+  },
+  "auth": {
+    "welcome_title": "Bienvenue chez SU Curries!",
+    "welcome_message": "Connectez-vous pour accéder aux fonctionnalités exclusives et suivre vos commandes."
+  },
+  "common": {
+    "continue_as_guest": "Continuer en tant qu'invité"
+  }
+} 
