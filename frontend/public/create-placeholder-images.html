@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Placeholder Images</title>
+</head>
+<body>
+    <h1>Creating Placeholder Images...</h1>
+    <canvas id="canvas" width="1200" height="600" style="display: none;"></canvas>
+    
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Function to create and download image
+        function createImage(width, height, bgColor, textColor, text, filename) {
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Fill background
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, width, height);
+            
+            // Add text
+            ctx.fillStyle = textColor;
+            ctx.font = 'bold 48px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, width/2, height/2);
+            
+            // Convert to blob and download
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        }
+        
+        // Create hero images
+        setTimeout(() => createImage(1200, 600, '#ff6b35', '#ffffff', 'Premix Products', 'premix-products.png'), 100);
+        setTimeout(() => createImage(1200, 600, '#2d2d2d', '#ffffff', 'Restaurant Dining', 'restaurant-dining.png'), 200);
+        setTimeout(() => createImage(1200, 600, '#1a1a1a', '#ffffff', 'Catering Services', 'catering-services.png'), 300);
+        
+        // Create product images
+        setTimeout(() => createImage(300, 200, '#ff6b35', '#ffffff', 'Curry Base', 'curry-base.png'), 400);
+        setTimeout(() => createImage(300, 200, '#2d2d2d', '#ffffff', 'Tomato Gravy', 'tomato-gravy.png'), 500);
+        setTimeout(() => createImage(300, 200, '#1a1a1a', '#ffffff', 'Spice Mix', 'spice-mix.png'), 600);
+        setTimeout(() => createImage(300, 200, '#ff6b35', '#ffffff', 'Tikka Masala', 'tikka-masala.png'), 700);
+        
+        document.body.innerHTML += '<p>Images created! Check your downloads folder and move them to the appropriate directories.</p>';
+    </script>
+</body>
+</html>

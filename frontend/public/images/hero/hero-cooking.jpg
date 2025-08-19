@@ -1,0 +1,4 @@
+<svg width="1200" height="600" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="600" fill="#1976d2"/>
+    <text x="600" y="300" font-family="Arial, sans-serif" font-size="18" fill="white" text-anchor="middle" dy=".3em">Cooking Classes</text>
+  </svg>
